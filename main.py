@@ -1,11 +1,11 @@
 import PIL
 from PIL import Image, ImageFilter
 import numpy as np
+import cv2 as cv
 
 def toCannyDetect(img):
     tempImage = img.convert('L').point(lambda x: 0 if x < 128 else 255, 'L')
-    tempImage = tempImage.filter(ImageFilter.FIND_EDGES) 
-    return tempImage
+    return tempImage.filter(ImageFilter.FIND_EDGES) 
 
 '''
 def dilateCross(ar,x):
@@ -37,18 +37,51 @@ def dilateCross(ar,x):
     #finalImage.show()
 '''
 
-caminho_img = 'lixo.jpg'
+folder = 'imagens/dangerzone'
+nome = 'Teste01'
+
+img = cv.imread(folder+nome+'.png')
+imgray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+ret, thresh = cv.threshold(imgray, 200, 255, 0)
+contours, hierarchy = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+
+nfolhas = 0 
+for i in range(len(contours)): 
+    if(cv.contourArea(contours[i]) > 1000.0): # tava pegando alguns pontos, area > 1000 é só pra pegar coisa grande
+        nfolhas += 1
+        
+        print(i, cv.contourArea(contours[i]))
+        x,y,w,h = cv.boundingRect(contours[i])
+        
+        cv.rectangle(img,(x,y),(x+w,y+h),(0,0,255),2)
+        
+        ROI = img[y:y+h, x:x+w]
+        cv.imwrite(folder+nome+'_ROI_{}.png'.format(nfolhas), ROI)
+        cv.imwrite(folder+nome+'ident'+'.png',img)
+
+
+print('\nNúmero de contornos: ',  len(contours))
+print('Número de folhas identificadas: ', nfolhas)
+
+'''
+cv.imshow('image', img)
+cv.waitKey(5000)
+cv.destroyAllWindows()
+'''
+
+
+'''
 img = Image.open('imagens/' + caminho_img)
+
 
 print("Formato:", img.format)
 print("Size:", img.size)
 print("Mode:", img.mode)
 
-nparray = np.array(img)
+grayImg = toCannyDetect(img)
+grayImg.show()
+
+nparray = np.array(grayImg)
 print('Array:\n',nparray)
 finalImage = Image.fromarray(np.uint8(nparray))
-
-teste = toCannyDetect(img)
-
-teste.save('imagens/geradas/lixo2.jpg')
-teste.show()
+'''
