@@ -37,28 +37,28 @@ def dilateCross(ar,x):
     #finalImage.show()
 '''
 
-folder = 'imagens/dangerzone'
+folder = 'imagens/dangerzone/'
 nome = 'Teste01'
 
 img = cv.imread(folder+nome+'.png')
+copy = img.copy()
 imgray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 ret, thresh = cv.threshold(imgray, 200, 255, 0)
 contours, hierarchy = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
 
 nfolhas = 0 
 for i in range(len(contours)): 
-    if(cv.contourArea(contours[i]) > 1000.0): # tava pegando alguns pontos, area > 1000 é só pra pegar coisa grande
+    if(cv.contourArea(contours[i]) > 5.0): # tava pegando algumas áreas ridiculas
         nfolhas += 1
-        
         print(i, cv.contourArea(contours[i]))
-        x,y,w,h = cv.boundingRect(contours[i])
-        
-        cv.rectangle(img,(x,y),(x+w,y+h),(0,0,255),2)
-        
-        ROI = img[y:y+h, x:x+w]
-        cv.imwrite(folder+nome+'_ROI_{}.png'.format(nfolhas), ROI)
-        cv.imwrite(folder+nome+'ident'+'.png',img)
 
+        x,y,w,h = cv.boundingRect(contours[i])
+        ROI = img[y:y+h, x:x+w]
+        ##cv.imwrite(folder+nome+'_ROI_{}.png'.format(nfolhas), ROI)
+
+        cv.rectangle(copy,(x,y),(x+w,y+h),(0,0,255),2)
+        ##cv.imwrite(folder+nome+'ident'+'.png',img)
+        
 
 print('\nNúmero de contornos: ',  len(contours))
 print('Número de folhas identificadas: ', nfolhas)
