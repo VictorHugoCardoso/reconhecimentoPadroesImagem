@@ -8,6 +8,8 @@ def toCannyDetect(img):
     tempImage = img.convert('L').point(lambda x: 0 if x < 128 else 255, 'L')
     return tempImage.filter(ImageFilter.FIND_EDGES) 
 
+def slope(x1, y1, x2, y2):
+    return (y2-y1)/(x2-x1)
 
 folder = 'imagens/dangerzone/'
 nome = 'Teste02'
@@ -19,11 +21,12 @@ ret, thresh = cv.threshold(imgray, 200, 255, 0)
 contours, hierarchy = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
 
 nfolhas = 0 
-intelFolhas = []
+intelFolhas = [['fonte','folha','perimetro']]
 
 for i in range(1,len(contours)): 
     if(cv.contourArea(contours[i]) > 100.0): # tava pegando algumas áreas ridiculas
         nfolhas += 1
+        '''
         print(i, cv.contourArea(contours[i]))
 
         # faz um bound box do contorno identificado
@@ -39,71 +42,43 @@ for i in range(1,len(contours)):
         cv.rectangle(copy,(x,y),(x+w,y+h),(0,0,255),2)
         cv.imwrite(folder+nome+'ident'+'.png',copy)
         
-        contarPixels = 0
-        for j in range (ROIGray.shape[0]):
-            for k in range (ROIGray.shape[1]):
-                if(ROIGray[j,k,0] > 0):
-                    contarPixels += 1
+        '''
+j=0
+k=0
+perimetro=0
 
-        intel = [nome, 'folha{}'.format(nfolhas), contarPixels]
-        intelFolhas.append(intel)
+for n in range(1,nfolhas+1): 
+    thresh = cv.imread(folder+nome+'-{}-P.png'.format(n), cv.IMREAD_GRAYSCALE)
+    
+    height, width = thresh.shape
+
+
+    for j in range(thresh.shape[0]):
+        for k in range(thresh.shape[1]):
+            if (thresh[j][k] == 255):
+                start_point = (j, k)
+                #print(start_point)
+                perimetro = perimetro+1;
+
+    
+    intel = [nome, 'folha{}'.format(n), perimetro]
+    intelFolhas.append(intel)
+
+    break
 
 
 print(intelFolhas)
 print('\nNúmero de contornos: ',  len(contours))
 print('Número de folhas identificadas: ', nfolhas)
 
+
+with open(folder+"informacao.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerows(intelFolhas)
+
+
 '''
 cv.imshow('image', img)
 cv.waitKey(5000)
 cv.destroyAllWindows()
-'''
-
-
-'''
-img = Image.open('imagens/' + caminho_img)
-
-
-print("Formato:", img.format)
-print("Size:", img.size)
-print("Mode:", img.mode)
-
-grayImg = toCannyDetect(img)
-grayImg.show()
-
-nparray = np.array(grayImg)
-print('Array:\n',nparray)
-finalImage = Image.fromarray(np.uint8(nparray))
-'''
-
-
-
-'''
-def dilateCross(ar,x):
-    for n in range(x): 
-        for i in range(ar.shape[0]):
-            for j in range(ar.shape[1]):
-                if (ar[i, j] == 255):
-                    if ((i>0) and (ar[i-1, j]==0)):
-                        ar[i-1,j] = 2 #cima
-                    
-                    if ((j>0) and (ar[i, j-1]==0)):
-                        ar[i,j-1] = 2 #esquerda
-                    
-                    if ((i+1<ar.shape[0]) and (ar[i+1, j]==0)):
-                        ar[i+1, j] = 2 #baixo
-
-                    if ((j+1<ar.shape[1]) and (ar[i, j+1]==0)):
-                        ar[i, j+1] = 2 #direita
-
-        for i in range(ar.shape[0]):
-            for j in range(ar.shape[1]):
-                if (ar[i, j] == 2):
-                    ar[i, j] = 255
-        print(n,'...')
-
-    print('Dilated:\n',ar)
-    finalImage = Image.fromarray(np.uint8(ar))
-    finalImage.save('imagens/geradas/dilatedCross.png')
-    #finalImage.show()
 '''
