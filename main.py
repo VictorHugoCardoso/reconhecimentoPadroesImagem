@@ -8,6 +8,7 @@ def toCannyDetect(img):
     tempImage = img.convert('L').point(lambda x: 0 if x < 128 else 255, 'L')
     return tempImage.filter(ImageFilter.FIND_EDGES) 
 
+# numpy.arctan2(dY, dX)
 def slope(x1, y1, x2, y2):
     return (y2-y1)/(x2-x1)
 
@@ -57,6 +58,8 @@ for n in range(1,nfolhas+1):
     thresh = cv.imread(folder+nome+'-{}-P.png'.format(n), cv.IMREAD_GRAYSCALE)
     height, width = thresh.shape
 
+    image = thresh.copy()
+
     # descobre o ponto mais a esquerda superior
     for j in range(thresh.shape[0]):
         for k in range(thresh.shape[1]):
@@ -68,7 +71,7 @@ for n in range(1,nfolhas+1):
         else:
             continue
         break
-    
+
     intel = [nome, 'folha{}'.format(n), perimetro]
     intelFolhas.append(intel)
 
