@@ -12,7 +12,7 @@ def slope(x1, y1, x2, y2):
     return (y2-y1)/(x2-x1)
 
 folder = 'imagens/dangerzone/'
-nome = 'Teste02'
+nome = 'Teste02' # arquivo
 
 img = cv.imread(folder+nome+'.png')
 copy = img.copy()
@@ -21,8 +21,10 @@ ret, thresh = cv.threshold(imgray, 200, 255, 0)
 contours, hierarchy = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
 
 nfolhas = 0 
-intelFolhas = [['fonte','folha','perimetro']]
+intelFolhas = [['fonte','folha','perimetro']] # cabecalho csv
 
+
+# função pra recortar as folhas
 for i in range(1,len(contours)): 
     if(cv.contourArea(contours[i]) > 100.0): # tava pegando algumas áreas ridiculas
         nfolhas += 1
@@ -43,31 +45,35 @@ for i in range(1,len(contours)):
         cv.imwrite(folder+nome+'ident'+'.png',copy)
         
         '''
+
+
+
 j=0
 k=0
 perimetro=0
 
+#aqui mapeia o freeman
 for n in range(1,nfolhas+1): 
     thresh = cv.imread(folder+nome+'-{}-P.png'.format(n), cv.IMREAD_GRAYSCALE)
-    
     height, width = thresh.shape
 
-
+    # descobre o ponto mais a esquerda superior
     for j in range(thresh.shape[0]):
         for k in range(thresh.shape[1]):
             if (thresh[j][k] == 255):
                 start_point = (j, k)
-                #print(start_point)
-                perimetro = perimetro+1;
-
+                print(start_point)
+                perimetro = perimetro+1
+                break
+        else:
+            continue
+        break
     
     intel = [nome, 'folha{}'.format(n), perimetro]
     intelFolhas.append(intel)
 
     break
 
-
-print(intelFolhas)
 print('\nNúmero de contornos: ',  len(contours))
 print('Número de folhas identificadas: ', nfolhas)
 
