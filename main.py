@@ -64,50 +64,42 @@ def trace_boundary(image):
   previous_directions.append(7)
   start_search_directions.append(np.mod((previous_directions[0] - 6), 8))
 
-  n = 0 # Counter for boundary pixels
+  n = 0 # numPixels
 
   while True:
-    # Check convergence criteria. We terminate the algorithm when we are back
-    # at the starting point.
+    # acaba o algoritmo quando chega no pixel inicial
     if n > 2:
       if ((boundary_positions[n-1] == boundary_positions[0]) and
               (boundary_positions[n] == boundary_positions[1])):
         break
 
-    search_neighbourhood = True # This variable indicates whether to continue
-                                # to search the local neighbourhood for an
-                                # object pixel
-    loc_counter = 0 # This variable keeps track of how many local neighbourhood
-                    # pixels we have searched.
-    x, y = boundary_positions[n] # We get the (x,y)-coordinates of our current
-                                 # position on the boundary.
+    search_neighbourhood = True 
+    loc_counter = 0
 
-    # Then, we search the neighbourhood of (x,y) for an object pixel.
+    x, y = boundary_positions[n] # (x,y) do pixel atual do contorno
+                                 
+
+    # procura (x,y) vizinho
     while search_neighbourhood:
 
-      # Find the next pixel in the neighbourhood of (x,y) to check (we search
-      # in a clockwise direction in the local neighbourhood also)
+      # procura o próximo pixel conectado
       direction = np.mod(start_search_directions[n] - loc_counter, connectivity)
       next_x, next_y = next_index_in_neighbourhood(x, y, direction)
 
-      # If we go beyond the image frame, we skip it, and continue the search
-      # from the next pixel in the neighbourhood.
       if next_x < 0 or next_x >= M or next_y < 0 or next_y >= N:
         search_neighbourhood = True
         loc_counter += 1
         continue
 
-      # Check if we encountered an object pixel
+      # Checa se encontrou pixel
       if not (image[next_x, next_y] == background):
-        # Found one: terminate the search in this neighbourhood
+        # Se sim, termina de procurar nessa vizinhança
         search_neighbourhood = False
       else:
-        # Did not find one: continue the search in this neighbourhood
+        # Se não, continua a procurar nessa vizinhança
         loc_counter += 1
-        #search_neighbourhood = True
 
-    # We append the direction we used to find the object pixel to the chain
-    # code, and also update the list of boundary positions
+    # atualiza a lista de direções e a lista de limite
     previous_directions.append(direction)
     boundary_positions.append([next_x, next_y])
 
@@ -201,17 +193,11 @@ def eachLeaf(folder, nome, nFolhas):
 def main():
     folder = 'imagens/dangerzone/'
     nome = 'Teste02' # arquivo
-
+    asd=0
     nFolhas = cutLeafs(folder, nome)
     infoCSV = eachLeaf(folder, nome, nFolhas)
     writeCSV(folder, infoCSV)
 
 main()
 
-
-
-#newX, newY = next_index_in_neighbourhood(start_point[0],start_point[1], 8)
-
-
-
-
+ 
