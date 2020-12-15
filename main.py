@@ -186,9 +186,9 @@ def eachLeaf(folder, nome, nFolhas):
         
         chain_code, boundary, firstPoint, perimetro = trace_boundary(image)
         print(chain_code)
-        print(boundary)
-        print(firstPoint)
-        print(perimetro)
+        #print(boundary)
+        print('firstPoint: ', firstPoint)
+        print('perimetro: ', perimetro)
 
 
         info = [nome, 'folha{}'.format(n), perimetro, chain_code]
@@ -196,7 +196,7 @@ def eachLeaf(folder, nome, nFolhas):
 
         break
     
-    return info
+    return cabecalho
 
 def main():
     folder = 'imagens/dangerzone/'
