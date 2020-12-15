@@ -10,6 +10,20 @@ def next_index_in_neighbourhood(x, y, direction):
     next_y = y + dy
     return next_x, next_y
 
+
+'''
+3   2   1
+\  |  /
+4-(x,y)-0
+/  |  \
+5   6   7
+
+Slope: chain code 0 | 1  | 2  |3   |4   |5    |6   |7
+theta:            0 | 45 | 90 |135 |180 |-135 |-90 |-45
+'''
+
+
+
 def dir_to_coord(direction):
     if direction == 0:
         dx = 0
@@ -38,27 +52,49 @@ def dir_to_coord(direction):
 
     return dx, dy
 
+def dir_to_angle(direction):
+    if direction == 1:
+        return 45
+    if direction == 2:
+        return 90
+    if direction == 3:
+        return 135
+    if direction == 4:
+        return 180
+    if direction == 5:
+        return -135
+    if direction == 6:
+        return -90
+    if direction == 7:
+        return -45
+    return 0
 
 def trace_boundary(image):
-  connectivity = 8
   background = 0
+  perimetro = 0
 
   M, N = image.shape
   previous_directions = [] 
   start_search_directions = [] 
   boundary_positions = [] 
 
-  found_object = False
+  achou = False
 
   # localiza o pixel mais à cima e à esquerda
   for x in range(M):
     for y in range(N):
       if not (image[x, y] == background):
         p0 = [x, y]
-        found_object = True
+        achou = True
         break
-    if found_object:
+    if achou:
       break
+  
+  #conta perimetro
+  for x in range(M):
+    for y in range(N):
+      if not (image[x, y] == background):
+        perimetro += 1
 
   boundary_positions.append(p0)
   previous_directions.append(7)
@@ -77,13 +113,12 @@ def trace_boundary(image):
     loc_counter = 0
 
     x, y = boundary_positions[n] # (x,y) do pixel atual do contorno
-                                 
 
     # procura (x,y) vizinho
     while search_neighbourhood:
 
       # procura o próximo pixel conectado
-      direction = np.mod(start_search_directions[n] - loc_counter, connectivity)
+      direction = np.mod(start_search_directions[n] - loc_counter, 8)
       next_x, next_y = next_index_in_neighbourhood(x, y, direction)
 
       if next_x < 0 or next_x >= M or next_y < 0 or next_y >= N:
@@ -115,12 +150,23 @@ def trace_boundary(image):
 
   chain_code = previous_directions[1:-1]
 
-  return chain_code, boundary_positions, p0, n
+  return chain_code, boundary_positions, p0, perimetro
 
-def toCannyDetect(img):
-    tempImage = img.convert('L').point(lambda x: 0 if x < 128 else 255, 'L')
-    return tempImage.filter(ImageFilter.FIND_EDGES) 
+def getAngles(chain_code):
 
+    angles = []
+    for i in range(len(chain_code)):
+        thisAngle = dir_to_angle(chain_code[i])
+
+        if(i+1==len(chain_code)):
+            nextAngle = dir_to_angle(chain_code[0])
+        else:
+            nextAngle = dir_to_angle(chain_code[i+1])
+        
+        
+        angles.append(thisAngle)
+
+    return angles
 
 def showImg(img):
     cv.imshow('image', img)
@@ -177,7 +223,9 @@ def eachLeaf(folder, nome, nFolhas):
         image = thresh.copy()
         
         chain_code, boundary, firstPoint, perimetro = trace_boundary(image)
-        print(chain_code)
+        angles = getAngles(chain_code)
+
+        print(angles)
         #print(boundary)
         print('firstPoint: ', firstPoint)
         print('perimetro: ', perimetro)
@@ -197,6 +245,9 @@ def main():
     nFolhas = cutLeafs(folder, nome)
     infoCSV = eachLeaf(folder, nome, nFolhas)
     writeCSV(folder, infoCSV)
+
+    #[0, 575], [1, 576]
+    #[1, 592], [2, 593]
 
 main()
 
