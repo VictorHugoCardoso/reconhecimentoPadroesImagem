@@ -193,7 +193,7 @@ def eachLeaf(folder, nome, nFolhas):
 def main():
     folder = 'imagens/dangerzone/'
     nome = 'Teste02' # arquivo
-    asd=0
+    
     nFolhas = cutLeafs(folder, nome)
     infoCSV = eachLeaf(folder, nome, nFolhas)
     writeCSV(folder, infoCSV)
