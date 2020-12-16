@@ -197,6 +197,8 @@ def writeCSV(folder, vector):
         writer = csv.writer(f)
         writer.writerows(vector)
 
+    print('\n\nInformações Gravadas no CSV!\n\n')
+
 def getTheta(p1, p2):
     deltaX = p2[0] - p1[0]
     deltaY = p2[1] - p1[1]
@@ -215,11 +217,12 @@ def cutLeafs(folder, nome):
 
     nFolhas = 0
 
+    print('Extraindo folhas...')
     for i in range(1,len(contours)): 
         if(cv.contourArea(contours[i]) > 100.0): # tava pegando algumas áreas ridiculas
             nFolhas += 1
-            '''
-            print(i, cv.contourArea(contours[i]))
+            
+            print('Contorno {}'.format(i)) 
 
             # faz um bound box do contorno identificado
             x,y,w,h = cv.boundingRect(contours[i])
@@ -233,15 +236,16 @@ def cutLeafs(folder, nome):
 
             cv.rectangle(copy,(x,y),(x+w,y+h),(0,0,255),2)
             cv.imwrite(folder+nome+'ident'+'.png',copy)
-            '''
+            
 
-    print('\nNúmero de contornos: ',  len(contours))
-    print('Número de folhas identificadas: ', nFolhas)
+    print('\nNúmero de contornos: {}'.format(len(contours)))
+    print('Número de folhas identificadas: {}\n'.format(nFolhas))
     return nFolhas
 
 def eachLeaf(folder, nome, nFolhas):
     cabecalho = [['fonte','folha','perimetro','sccCount','SCC']] # cabecalho csv
 
+    print('Salvando informações...')
     for n in range(1,nFolhas+1): 
         thresh = cv.imread(folder+nome+'-{}-P.png'.format(n), cv.IMREAD_GRAYSCALE)
         height, width = thresh.shape
@@ -250,21 +254,12 @@ def eachLeaf(folder, nome, nFolhas):
         
         chain_code, boundary, firstPoint, perimetro = trace_boundary(image)
         
-        angles = getSCC(boundary, 2)
-
-        pontos = getSCCTESTE(boundary, 200)
-
-        img = np.zeros((image.shape[0],image.shape[1],3), np.uint8)
-        pts = np.array([boundary], np.int32)
-        pts = pts.reshape((-1,1,2))
-        cv.polylines(img, [pts], True, (0,255,0), 1)
-        cv.imwrite(folder+nome+'-{}-C.png'.format(nFolhas), img)
+        angles = getSCC(boundary, 100)
 
         info = [nome, 'folha{}'.format(n), perimetro, len(angles), angles]
         cabecalho.append(info)
+        print('Folha {}'.format(n))
 
-        break
-    
     return cabecalho
 
 def main():
