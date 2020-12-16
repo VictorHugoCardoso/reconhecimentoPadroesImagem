@@ -151,6 +151,41 @@ def trace_boundary(image):
 
   return chain_code, boundary_positions, p0, perimetro
 
+def getSCC(boundary, r):
+    angles = []
+    radius = r
+    i = 0
+    while(i+radius < len(boundary)):
+        
+        thisPoint = boundary[i]
+        nextPoint = boundary[i+radius]
+
+        theta = getTheta(thisPoint, nextPoint)
+        angles.append(round(theta,1))
+        
+        #print(thisPoint, nextPoint, theta)
+
+        i += radius
+
+    return angles
+
+def getSCCTESTE(boundary, r):
+    angles = []
+    radius = r
+    i = 0
+    while(i+radius < len(boundary)):
+        
+        thisPoint = boundary[i]
+        nextPoint = boundary[i+radius]
+
+        theta = getTheta(thisPoint, nextPoint)
+        angles.append(thisPoint)
+        
+        #print(thisPoint, nextPoint, theta)
+
+        i += radius
+
+    return angles
 
 def showImg(img):
     cv.imshow('image', img)
@@ -161,6 +196,13 @@ def writeCSV(folder, vector):
     with open(folder+"informacao.csv", "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerows(vector)
+
+def getTheta(p1, p2):
+    deltaX = p2[0] - p1[0]
+    deltaY = p2[1] - p1[1]
+
+    theta = math.degrees(math.atan2(deltaY, deltaX))
+    return theta
 
 # recortar as folhas
 def cutLeafs(folder, nome):
@@ -198,7 +240,7 @@ def cutLeafs(folder, nome):
     return nFolhas
 
 def eachLeaf(folder, nome, nFolhas):
-    cabecalho = [['fonte','folha','perimetro','freeman']] # cabecalho csv
+    cabecalho = [['fonte','folha','perimetro','sccCount','SCC']] # cabecalho csv
 
     for n in range(1,nFolhas+1): 
         thresh = cv.imread(folder+nome+'-{}-P.png'.format(n), cv.IMREAD_GRAYSCALE)
@@ -208,25 +250,17 @@ def eachLeaf(folder, nome, nFolhas):
         
         chain_code, boundary, firstPoint, perimetro = trace_boundary(image)
         
-        radius = 1
-        for i in range(len(boundary)):
-            if(i+radius < len(boundary)):
-                thisPoint = boundary[i]
-                nextPoint = boundary[i+radius]
+        angles = getSCC(boundary, 2)
 
-                deltaX = nextPoint[0] - thisPoint[0]
-                deltaY = nextPoint[1] - thisPoint[1]
+        pontos = getSCCTESTE(boundary, 200)
 
-                theta = math.atan2(deltaY, deltaX)
+        img = np.zeros((image.shape[0],image.shape[1],3), np.uint8)
+        pts = np.array([boundary], np.int32)
+        pts = pts.reshape((-1,1,2))
+        cv.polylines(img, [pts], True, (0,255,0), 1)
+        cv.imwrite(folder+nome+'-{}-C.png'.format(nFolhas), img)
 
-                print(thisPoint, nextPoint, theta)
-
-
-        print('firstPoint: ', firstPoint)
-        print('perimetro: ', perimetro)
-
-
-        info = [nome, 'folha{}'.format(n), perimetro, chain_code]
+        info = [nome, 'folha{}'.format(n), perimetro, len(angles), angles]
         cabecalho.append(info)
 
         break
@@ -240,9 +274,6 @@ def main():
     nFolhas = cutLeafs(folder, nome)
     infoCSV = eachLeaf(folder, nome, nFolhas)
     writeCSV(folder, infoCSV)
-
-    #[0, 575], [1, 576]
-    #[1, 592], [2, 593]
 
 main()
 
