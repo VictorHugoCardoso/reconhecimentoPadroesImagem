@@ -3,6 +3,7 @@ from PIL import Image, ImageFilter
 import numpy as np
 import cv2 as cv
 import csv
+import math
 
 def next_index_in_neighbourhood(x, y, direction):
     dx, dy = dir_to_coord(direction)
@@ -21,9 +22,6 @@ def next_index_in_neighbourhood(x, y, direction):
 Slope: chain code 0 | 1  | 2  |3   |4   |5    |6   |7
 theta:            0 | 45 | 90 |135 |180 |-135 |-90 |-45
 '''
-
-def slope(x1, y1, x2, y2):
-    return (y2-y1)/(x2-x1)
 
 def dir_to_coord(direction):
     if direction == 0:
@@ -153,29 +151,6 @@ def trace_boundary(image):
 
   return chain_code, boundary_positions, p0, perimetro
 
-def getAngles(chain_code):
-
-    angles = []
-    for i in range(len(chain_code)):
-        thisAngle = dir_to_angle(chain_code[i])        
-        angles.append(thisAngle)
-
-    return angles
-
-def getFirstDiff(chain_code):
-    diff = []
-    l = len(chain_code)
-    for i in range(l):
-        if(i+1!= l):
-            if(chain_code[i+1]!=0):
-                thisDiff = chain_code[i+1] - chain_code[i]
-                if(thisDiff<0):
-                    thisDiff += 8    
-            else:
-                thisDiff = 0
-            diff.append(thisDiff)
-
-    return diff
 
 def showImg(img):
     cv.imshow('image', img)
@@ -232,10 +207,21 @@ def eachLeaf(folder, nome, nFolhas):
         image = thresh.copy()
         
         chain_code, boundary, firstPoint, perimetro = trace_boundary(image)
+        
+        radius = 1
+        for i in range(len(boundary)):
+            if(i+radius < len(boundary)):
+                thisPoint = boundary[i]
+                nextPoint = boundary[i+radius]
 
-        
-        
-        print(boundary)
+                deltaX = nextPoint[0] - thisPoint[0]
+                deltaY = nextPoint[1] - thisPoint[1]
+
+                theta = math.atan2(deltaY, deltaX)
+
+                print(thisPoint, nextPoint, theta)
+
+
         print('firstPoint: ', firstPoint)
         print('perimetro: ', perimetro)
 
