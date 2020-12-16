@@ -22,7 +22,8 @@ Slope: chain code 0 | 1  | 2  |3   |4   |5    |6   |7
 theta:            0 | 45 | 90 |135 |180 |-135 |-90 |-45
 '''
 
-
+def slope(x1, y1, x2, y2):
+    return (y2-y1)/(x2-x1)
 
 def dir_to_coord(direction):
     if direction == 0:
@@ -156,17 +157,25 @@ def getAngles(chain_code):
 
     angles = []
     for i in range(len(chain_code)):
-        thisAngle = dir_to_angle(chain_code[i])
-
-        if(i+1==len(chain_code)):
-            nextAngle = dir_to_angle(chain_code[0])
-        else:
-            nextAngle = dir_to_angle(chain_code[i+1])
-        
-        
+        thisAngle = dir_to_angle(chain_code[i])        
         angles.append(thisAngle)
 
     return angles
+
+def getFirstDiff(chain_code):
+    diff = []
+    l = len(chain_code)
+    for i in range(l):
+        if(i+1!= l):
+            if(chain_code[i+1]!=0):
+                thisDiff = chain_code[i+1] - chain_code[i]
+                if(thisDiff<0):
+                    thisDiff += 8    
+            else:
+                thisDiff = 0
+            diff.append(thisDiff)
+
+    return diff
 
 def showImg(img):
     cv.imshow('image', img)
@@ -223,10 +232,10 @@ def eachLeaf(folder, nome, nFolhas):
         image = thresh.copy()
         
         chain_code, boundary, firstPoint, perimetro = trace_boundary(image)
-        angles = getAngles(chain_code)
 
-        print(angles)
-        #print(boundary)
+        
+        
+        print(boundary)
         print('firstPoint: ', firstPoint)
         print('perimetro: ', perimetro)
 
