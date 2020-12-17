@@ -210,6 +210,7 @@ def getTheta(p1, p2):
 # recortar as folhas
 def cutLeafs(folder, nome):
     
+    print(folder+nome+'.png')
     img = cv.imread(folder+nome+'.png')
     copy = img.copy()
     imgray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -229,7 +230,7 @@ def cutLeafs(folder, nome):
             x,y,w,h = cv.boundingRect(contours[i])
             ROI = img[y:y+h, x:x+w]
             
-            '''
+            
             cv.imwrite(folder+nome+'-{}.png'.format(nFolhas), ROI)
 
             drawing = np.zeros(img.shape)
@@ -239,7 +240,7 @@ def cutLeafs(folder, nome):
 
             cv.rectangle(copy,(x,y),(x+w,y+h),(0,0,255),2)
             cv.imwrite(folder+nome+'ident'+'.png',copy)
-            '''
+            
             
 
     print('\nNúmero de contornos: {}'.format(len(contours)))
@@ -264,14 +265,27 @@ def eachLeaf(folder, nome, nFolhas, radius):
         cabecalho.append(info)
         print('Folha {}...'.format(n))
 
-        break #retirar esse break
+        #break #retirar esse break
 
     return cabecalho
 
 def main():
+    
+    print('Entre com o nome da Pasta (e.g: imagens): ')
+    folder = input()
+
+    print('\nEntre com o nome do Arquivo (sem extenção. e.g: Teste01): ')
+    nome = input()
+
+    print('\nEntre com o tamanho raio do Segmento da Cadeia de Inclinação (e.g:1, 10, 100): ')
+    radius = int(input())
+
+    folder = folder+'/'
+    '''
     folder = 'imagens/dangerzone/'
     nome = 'Teste02' # arquivo
-    radius = 10
+    radius = 1
+    '''
     
     nFolhas = cutLeafs(folder, nome)
     infoCSV = eachLeaf(folder, nome, nFolhas, radius)
