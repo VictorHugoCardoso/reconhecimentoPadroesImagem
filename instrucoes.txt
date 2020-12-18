@@ -3,7 +3,7 @@ Requisitos
 1. Windows 10
 2. Python 3
 3. Pip3
-4. Biblioteca Pillow
+4. Biblioteca CV
 
 Instalacao
 
@@ -14,15 +14,16 @@ Dentro da Microsoft Store obtenha o python 3.7, e após isso execute o comando "
 3. Para instalar o pip3:
 	- Baixe o arquivo https://bootstrap.pypa.io/get-pip.py
 	- Execute o arquivo com python get-pip.py
-4. Dentro de um terminar execute "pip install Pillow" (ou pip3 install Pillow caso tenha duas versões do Python  na maquina)
+4. Dentro de um terminar execute "pip install opencv-python" (ou pip3 install opencv-python caso tenha duas versões do Python  na maquina)
 
 Intruções
 
-1. Coloque todas as imagens necessarias na pasta 'imagens' (algumas imagens de teste já estão lá)
-2. Execute o arquivo main.py com o comando: python main.py (python3 main.py caso tenha as duas versões do python instaladas), uma aba do navegador será aberta
-3. Insira o nome da imagem com sua extensao no campo "Nome da imagem" (a imagem deve estar na pasta 'imagens')
-4. Selecione quais algoritmos serão executados marcando o checkbox de cada um
-5. Insira a quantidade de vezes que o algoritmo será executa no campo "Repeticoes" ao lado do checkbox do algoritmo
-6. Clique na opcao enviar e aguarde o programa finalizar a execucao, as imagens serão geradas dentro da pasta 'imagens/geradas/'
+1. Coloque todas as imagens necessarias na pasta 'imagens/folhas' (algumas imagens de teste já estão lá)
+2. Execute o arquivo main.py com o comando: python main.py (python3 main.py caso tenha as duas versões do python instaladas)
+3. Insira o caminho da pasta com as imagens, relativo a pasta onde o projeto está
+3. Insira o nome da imagem sem sua extensao
+4. Entre com o tamanho raio do Segmento da Cadeia de Inclinação (e.g:1, 10, 100)
+5. Aguarde o programa terminar a execução
+6. O resultado pode ser encontrado na pasta das imagens
 
 Alunos: Victor Hugo, Tiago Pereira
